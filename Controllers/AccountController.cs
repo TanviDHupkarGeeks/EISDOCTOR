@@ -50,7 +50,7 @@ namespace GreenHealth.Controllers
                 if (ModelState.IsValid)
                 {
                     var user = new IdentityUser { UserName = model.Email, Email = model.Email };
-                    var result = await userManger.CreateAsync(user, model.Password).ConfigureAwait(false);
+                    var result = await userManger.CreateAsync(user, model.Password);
 
                     if (result.Succeeded)
                     {
@@ -72,6 +72,45 @@ namespace GreenHealth.Controllers
             }
         }
 
+        // GET: Account/Create
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        // POST: Account/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            try
+            {
+                // TODO: Add insert logic here
+                if (ModelState.IsValid)
+                {
+                   
+                    var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, 
+                        model.RememberMe, false);
+
+                    if (result.Succeeded)
+                    {
+                        
+                        return RedirectToAction("index", "home");
+                    }
+                  
+                        ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
+                
+                }
+
+                return RedirectToAction(nameof(Login));
+
+            }
+            catch
+            {
+                return View();
+            }
+        }
         // GET: Account/Edit/5
         public ActionResult Edit(int id)
         {
@@ -116,6 +155,14 @@ namespace GreenHealth.Controllers
             {
                 return View();
             }
+        }
+
+        //Method to Log User Out
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await signInManager.SignOutAsync();
+            return RedirectToAction("index", "home");
         }
     }
 }
