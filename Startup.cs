@@ -38,6 +38,12 @@ namespace GreenHealth
 
             services.AddControllersWithViews();
             services.AddMvc().AddXmlSerializerFormatters();
+            services.AddAuthentication()
+                .AddFacebook(options =>
+                {
+                    options.AppId = "772499973213954";
+                    options.AppSecret = "e925b1f292fa1693d1522f18ea741a6e";
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
