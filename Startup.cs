@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using GreenHealth.Controllers;
 
 namespace GreenHealth
 {
@@ -30,10 +31,12 @@ namespace GreenHealth
             services.AddDbContextPool<AppDbContext>(
                 options => options.UseSqlServer(_config.GetConnectionString("GreenDbConnection")));
 
-            services.AddIdentity<IdentityUser, IdentityRole>(options => {
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options => {
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
-            }).AddEntityFrameworkStores<AppDbContext>();
+            }).AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultUI()
+            .AddDefaultTokenProviders();
 
 
             services.AddControllersWithViews();
@@ -46,8 +49,30 @@ namespace GreenHealth
                 });
         }
 
+        ////Role Creation Setup
+        //private async Task CreateUserRoles(IServiceProvider serviceProvider)
+        //{
+        //    var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        //    var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+        //    IdentityResult roleResult;
+        //    //Adding Admin Role
+        //    var roleCheck = await RoleManager.RoleExistsAsync("Admin");
+        //    if (!roleCheck)
+        //    {
+        //        //create the roles and seed them to the database
+        //        roleResult = await RoleManager.CreateAsync(new IdentityRole("Admin"));
+        //    }
+        //    //Assign Admin role to the main User here we have given our newly registered 
+        //    //login id for Admin management
+        //    ApplicationUser user = await UserManager.FindByEmailAsync("tanvidhupkar0728@gmail.com");
+        //    var User = new ApplicationUser();
+        //    await UserManager.AddToRoleAsync(user, "Admin");
+        //}
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext context, 
+            RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             if (env.IsDevelopment())
             {
@@ -73,6 +98,7 @@ namespace GreenHealth
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+            AdminController.Initialize(context, userManager, roleManager).Wait();
         }
     }
 }

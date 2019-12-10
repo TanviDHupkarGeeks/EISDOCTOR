@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using GreenHealth.ViewModels;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace GreenHealth.Models
 {
-    public class AppDbContext : IdentityDbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) 
              : base(options)
         {
            
         }
-        public DbSet<Patient> Patients { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

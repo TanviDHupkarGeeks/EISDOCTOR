@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GreenHealth.Models;
 using GreenHealth.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,14 +14,17 @@ namespace GreenHealth.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly RoleManager<ApplicationRole> roleManager;
 
-        public AccountController(UserManager<IdentityUser> userManager,
-                                    SignInManager<IdentityUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager,
+                                    SignInManager<ApplicationUser> signInManager,
+                                    RoleManager<ApplicationRole> roleManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.roleManager = roleManager;
         }
         // GET: Account
         public ActionResult Index()
@@ -57,12 +61,18 @@ namespace GreenHealth.Controllers
                 // TODO: Add insert logic here
                 if (ModelState.IsValid)
                 {
-                    var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+                    var user = new ApplicationUser { UserName = model.Email, Email = model.Email,
+                                                    PhoneNumber = model.PhoneNumber, FirstName = model.FirstName,
+                                                    LastName = model.LastName, BirthDate = model.BirthDate,
+                                                    Location = model.Location, Gender = model.Gender
+                    };
                     var result = await userManager.CreateAsync(user, model.Password);
 
                     if (result.Succeeded)
                     {
-                        await signInManager.SignInAsync(user, isPersistent: false);
+                    
+                    //await userManager.AddToRoleAsync(user, role1);
+                    await signInManager.SignInAsync(user, isPersistent: false);
                         return RedirectToAction("index","home");
                     }
                     foreach (var error in result.Errors)
@@ -187,7 +197,7 @@ namespace GreenHealth.Controllers
                     if (user == null)
                     {
 
-                        user = new IdentityUser
+                        user = new ApplicationUser
                         {
                             UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
                             Email = info.Principal.FindFirstValue(ClaimTypes.Email)
@@ -205,7 +215,7 @@ namespace GreenHealth.Controllers
 
                 // If we cannot find the user email we cannot continue
                 ViewBag.ErrorTitle = $"Email claim not received from: {info.LoginProvider}";
-                ViewBag.ErrorMessage = "Please contact support on Pragim@PragimTech.com";
+                ViewBag.ErrorMessage = "Please contact support on support@Greenhealth.com";
 
                 return View("Error");
             }
