@@ -11,7 +11,8 @@ namespace GreenHealth.Models
 
         public static void Seed(this ModelBuilder modelBuilder )
         {
-
+           
         }
+
     }
 }

@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -9,31 +9,46 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MailKit.Net;
+using MailKit;
+using MimeKit;
+using MailKit.Net.Smtp;
 
 namespace GreenHealth.Controllers
 {
+
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly IUnitOfWork _unitOfWork;
 
+        //public AccountController(IUnitOfWork unitOfWork)
+        //{
+        //    _unitOfWork = unitOfWork;
+        //}
         public AccountController(UserManager<ApplicationUser> userManager,
                                     SignInManager<ApplicationUser> signInManager,
-                                    RoleManager<ApplicationRole> roleManager)
+                                    RoleManager<ApplicationRole> roleManager, IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.roleManager = roleManager;
+            _unitOfWork = unitOfWork;
+
         }
+
         // GET: Account
-        public ActionResult Index()
+        [Authorize]
+        public IActionResult Index()
         {
+
             return View();
         }
 
         // GET: Account/Details/5
-        public ActionResult Details(int id)
+        public IActionResult Details(int id)
         {
             return View();
         }
@@ -44,8 +59,8 @@ namespace GreenHealth.Controllers
         {
             RegisterViewModel model = new RegisterViewModel
             {
-                ReturnUrl = returnUrl,
-                ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+                //ReturnUrl = returnUrl,
+                //ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
 
             };
 
@@ -57,33 +72,60 @@ namespace GreenHealth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-           
-                // TODO: Add insert logic here
-                if (ModelState.IsValid)
+
+            // TODO: Add insert logic here
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser
                 {
-                    var user = new ApplicationUser { UserName = model.Email, Email = model.Email,
-                                                    PhoneNumber = model.PhoneNumber, FirstName = model.FirstName,
-                                                    LastName = model.LastName, BirthDate = model.BirthDate,
-                                                    Location = model.Location, Gender = model.Gender
-                    };
-                    var result = await userManager.CreateAsync(user, model.Password);
+                    Name = model.Name,
+                    UserName = model.Email,
+                    Email = model.Email,
+                    Role = RoleName.PatientRoleName,
+                    IsActive = false
 
-                    if (result.Succeeded)
-                    {
-                    
-                    //await userManager.AddToRoleAsync(user, role1);
+
+                };
+                var result = await userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    //var message = new MimeMessage();
+                    //message.From.Add(new MailboxAddress("Tanvi", "tanvidhupkar@gmail.com"));
+                    ////From Address
+                    //message.To.Add(new MailboxAddress(user.Name, user.Email));
+                    ////To Address
+                    //message.Subject = "Welcome to Green Health";
+
+                    //message.Body = new TextPart("plain")
+                    //{
+                    //    Text = " You are welcome to Green Health. Please feel free to explore the community and get an appointment with the doctor of your choice today"
+                    //};
+
+
+                    await userManager.AddToRoleAsync(user, RoleName.PatientRoleName);
+                    await userManager.AddClaimAsync(user, new Claim(ClaimTypes.GivenName, model.Name));
                     await signInManager.SignInAsync(user, isPersistent: false);
-                        return RedirectToAction("index","home");
-                    }
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
+                    //using (var client = new SmtpClient())
+                    //{
+                    //    //client.Connect("smtp.gmail.com", 587, false);
+                    //    //client.Authenticate("chrisokhamera@gmail.com", "sophia123456");
+                    //    //client.Send(message);
+                    //    //client.Disconnect(true);
+                    //}
+                   
+                        return RedirectToAction("create", "patients");
+                    
                 }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
 
-                return View(model);
+            return View(model);
 
-        
+
         }
 
         // GET: Account/Login
@@ -96,7 +138,7 @@ namespace GreenHealth.Controllers
                 ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
 
             };
-           
+
             return View(model);
         }
 
@@ -105,38 +147,100 @@ namespace GreenHealth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-           
-                // TODO: Add insert logic here
-                if (ModelState.IsValid)
-                {
-                   
-                    var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, 
-                        model.RememberMe, false).ConfigureAwait(true);
 
-                    if (result.Succeeded)
-                    {
-                        
-                        return RedirectToAction("index", "home");
-                    }
-                  
-                        ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
-                
+            // TODO: Add insert logic here
+            if (ModelState.IsValid)
+            {
+
+                var result = await signInManager.PasswordSignInAsync(model.Email, model.Password,
+                    model.RememberMe, false).ConfigureAwait(true);
+
+                if (result.Succeeded)
+                {
+                    
+                    return RedirectToAction("index", "account");
                 }
 
-                return View(model);
+                ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
 
-          
-              
-           
+            }
+
+            return View(model);
+
+
+
+
         }
-        
+
+        //Doctor registration
+        [AllowAnonymous]
+        public IActionResult RegisterDoctor()
+        {
+            var viewModel = new DoctorFormViewModel()
+            {
+                Specializations = _unitOfWork.Specializations.GetSpecializations()
+                // Doctors = _doctorRepository.GetDectors()
+            };
+            return View("DoctorForm", viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RegisterDoctor(DoctorFormViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser()
+                {
+                    Name = viewModel.RegisterViewModel.Name,
+                    UserName = viewModel.RegisterViewModel.Email,
+                    Email = viewModel.RegisterViewModel.Email,
+                    IsActive = true
+                };
+                var result = await userManager.CreateAsync(user, viewModel.RegisterViewModel.Password);
+
+                if (result.Succeeded)
+                {
+
+                    await userManager.AddToRoleAsync(user, RoleName.DoctorRoleName);
+
+
+                    Doctor doctor = new Doctor()
+                    {
+                        Name = viewModel.Name,
+                        Phone = viewModel.Phone,
+                        Address = viewModel.Address,
+                        IsAvailable = true,
+                        SpecializationId = viewModel.Specialization,
+                        PhysicianId = user.Id,
+
+                    };
+                    await userManager.AddClaimAsync(user, new Claim(ClaimTypes.GivenName, doctor.Name));
+                    //Mapper.Map<DoctorFormViewModel, Doctor>(model, doctor);
+
+                    _unitOfWork.Doctors.Add(doctor);
+                    _unitOfWork.Complete();
+                    return RedirectToAction("Index", "Doctors");
+                }
+
+                ModelState.AddModelError("", "Something failed.");
+                return View(viewModel);
+            }
+
+            viewModel.Specializations = _unitOfWork.Specializations.GetSpecializations();
+
+            // If we got this far, something failed, redisplay form
+            return View("DoctorForm", viewModel);
+        }
+
+
         //External Login Code
         [HttpPost]
         [AllowAnonymous]
         public IActionResult ExternalLogin(string provider, string returnUrl)
         {
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account",
-                                 new {ReturnUrl =  returnUrl });
+                                 new { ReturnUrl = returnUrl });
 
             var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
 
@@ -203,7 +307,7 @@ namespace GreenHealth.Controllers
                             Email = info.Principal.FindFirstValue(ClaimTypes.Email)
                         };
                         await userManager.CreateAsync(user);
-                       
+
                     }
 
                     // Add a login (i.e insert a row for the user in AspNetUserLogins table)

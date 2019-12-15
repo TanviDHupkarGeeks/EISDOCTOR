@@ -1,25 +1,39 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GreenHealth.Models
 {
+    // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationUser : IdentityUser
     {
         
-        public string FirstName { get; set; }
-        
-        public string LastName { get; set; }
+        public string Name { get; set; }
+        public string Role { get; set; }
 
-        
-       
-        [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime BirthDate { get; set; }
-        public string Location { get; set; }
-        public string Gender { get; set; }
+        public bool? IsActive { get; set; }
+        public class MyUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<ApplicationUser>
+        {
+            public MyUserClaimsPrincipalFactory(
+                UserManager<ApplicationUser> userManager,
+                IOptions<IdentityOptions> optionsAccessor)
+                    : base(userManager, optionsAccessor) { }
+
+
+            
+
+            protected override async Task<ClaimsIdentity> GenerateClaimsAsync(ApplicationUser user)
+            {
+                var identity = await base.GenerateClaimsAsync(user);
+                identity.AddClaim(new Claim("UserName", user.UserName ?? "[Click to edit profile]"));
+                return identity;
+            }
+        }
     }
 }

@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using GreenHealth.Persistence;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using GreenHealth.Models;
+using Newtonsoft.Json;
 
 namespace GreenHealth.Controllers
 {
+    
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly AppDbContext _context;
+        public HomeController()
         {
-            _logger = logger;
+            _context = new AppDbContext();
         }
 
         public IActionResult Index()
@@ -23,15 +22,80 @@ namespace GreenHealth.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        //#region Dashboard Statistics
+        //public IActionResult TotalPatients()
+        //{
+        //    var patients = _context.Patients.ToList();
+        //    return Json(patients.Count());
+        //}
+
+        //public ActionResult TotalAppointments()
+        //{
+        //    var appointments =_context.Appointments.ToList();
+        //    return Json(appointments.Count());
+        //}
+
+        //public IActionResult TotalDoctors()
+        //{
+        //    var doctors = _context.Doctors.ToList();
+        //    return Json(doctors.Count());
+        //}
+
+        //public IActionResult TotalUsers()
+        //{
+        //    var users=_context.Users.ToList();
+        //    return Json(users.Count());
+        //}
+
+        ////Today's patients
+        //public IActionResult TodaysPatients()
+        //{
+        //    DateTime today = DateTime.Now.Date;
+        //    var patients = _context.Patients.Where(p => p.DateTime >= today).ToList();
+        //    return Json(patients.Count());
+        //}
+        ////Todays appointments
+        //public IActionResult TodaysAppointments()
+        //{
+        //    DateTime today = DateTime.Now.Date;
+        //    var appointments =_context.Appointments
+        //        .Where(a => a.StartDateTime >= today)
+        //        .ToList();
+        //    return Json(appointments.Count());
+        //}
+        ////Available doctors
+        //public IActionResult AvailableDoctors()
+        //{
+        //    var doctors=_context.Doctors
+        //        .Where(d => d.IsAvailable)
+        //        .ToList();
+        //    return Json(doctors.Count());
+        //}
+        ////Active Accounts
+        //public IActionResult ActiveAccounts()
+        //{
+        //    var users =_context.Users
+        //        .Where(u => u.EmailConfirmed == true)
+        //        .ToList();
+        //    return Json(users.Count());
+        //}
+        
+        //#endregion
+
+
+
+        public ActionResult About()
         {
+            ViewBag.Message = "Your application description page.";
+
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public ActionResult Contact()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            ViewBag.Message = "Your contact page.";
+
+            return View();
         }
     }
 }

@@ -12,6 +12,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using GreenHealth.Controllers;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using GreenHealth.Repositories;
+using GreenHealth.Persistence.Repositories;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace GreenHealth
 {
@@ -24,13 +31,20 @@ namespace GreenHealth
         }
 
         public IConfiguration Configuration { get; }
+     
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContextPool<AppDbContext>(
+            services.AddDbContext<AppDbContext>(
                 options => options.UseSqlServer(_config.GetConnectionString("GreenDbConnection")));
 
+            //services.AddScoped<IAuthorRepository, AuthorRepository>();
+            services.AddTransient<IDoctorRepository, DoctorRepository>();
+            services.AddTransient<ISpecializationRepository, SpecializationRepository>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); 
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddIdentity<ApplicationUser, ApplicationRole>(options => {
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
@@ -47,6 +61,7 @@ namespace GreenHealth
                     options.AppId = "772499973213954";
                     options.AppSecret = "e925b1f292fa1693d1522f18ea741a6e";
                 });
+            
         }
 
         ////Role Creation Setup
@@ -72,7 +87,8 @@ namespace GreenHealth
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext context, 
-            RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
+            RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager, 
+            SignInManager<ApplicationUser> signInManager)
         {
             if (env.IsDevelopment())
             {
@@ -98,6 +114,7 @@ namespace GreenHealth
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+            //SeedData.EnsurePopulated(app);
             AdminController.Initialize(context, userManager, roleManager).Wait();
         }
     }
