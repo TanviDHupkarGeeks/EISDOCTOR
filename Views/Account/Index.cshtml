@@ -1,7 +1,8 @@
-﻿@model IEnumerable<GreenHealth.ViewModels.UserViewModel>
+﻿@model Tuple<GreenHealth.ViewModels.UserViewModel, GreenHealth.Models.Patient>;
 
 @{
-    ViewBag.Title = "Manage users";
+    ViewBag.Title = "My profile";
+    var aa = Model;
 }
 <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
@@ -21,7 +22,7 @@
                     <th></th>
                 </tr>
                 </thead>
-                @foreach (var item in Model)
+                @*@foreach (var item in Model)
                 {
                     <tr>
                         <td>
@@ -47,7 +48,7 @@
 
 
                     </tr>
-                  }
+                  }*@
 
             </table>
             </div>

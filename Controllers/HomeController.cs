@@ -5,6 +5,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using GreenHealth.Models;
 using Newtonsoft.Json;
+using Microsoft.AspNet.Identity;
+using GreenHealth.Persistence.Repositories;
+using GreenHealth.Repositories;
+using System.Threading.Tasks;
+using System.Web;
+using Microsoft.AspNetCore.Http;
 
 namespace GreenHealth.Controllers
 {
@@ -12,15 +18,36 @@ namespace GreenHealth.Controllers
     public class HomeController : Controller
     {
         private readonly AppDbContext _context;
-        public HomeController()
+        private IProfile _profile;
+        public HomeController(IProfile profile)
         {
             _context = new AppDbContext();
+            _profile = profile;
         }
 
-        public IActionResult Index()
+        public IActionResult Me()
         {
+            var userId = HttpContext.User.Identity.GetUserId();
+            var userTypes = _profile.GetUserType(userId);
+            HttpContext.Session.SetString("USERID", JsonConvert.SerializeObject(userTypes));
+            if(userTypes.usertype == UserTypes.Doctor)
+            {
+                return Redirect("/doctors/index");
+            }
+            else
+            {
+                return Redirect("/account/index");
+            }
+            
+        }
+
+        public async Task<IActionResult> Index()
+        {
+           
             return View();
         }
+
+
 
         //#region Dashboard Statistics
         //public IActionResult TotalPatients()

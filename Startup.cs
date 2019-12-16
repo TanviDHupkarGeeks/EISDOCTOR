@@ -39,15 +39,27 @@ namespace GreenHealth
             services.AddDbContext<AppDbContext>(
                 options => options.UseSqlServer(_config.GetConnectionString("GreenDbConnection")));
 
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = ".GreenHealth.Session";
+                options.IdleTimeout = TimeSpan.FromSeconds(60 *60*24);
+                options.Cookie.IsEssential = true;
+            });
+
+
             //services.AddScoped<IAuthorRepository, AuthorRepository>();
             services.AddTransient<IDoctorRepository, DoctorRepository>();
             services.AddTransient<ISpecializationRepository, SpecializationRepository>();
+            services.AddTransient<IProfile, ProfileRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddIdentity<ApplicationUser, ApplicationRole>(options => {
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
+
+                //options.SignIn.RequireConfirmedEmail = true;
             }).AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultUI()
             .AddDefaultTokenProviders();
@@ -61,7 +73,8 @@ namespace GreenHealth
                     options.AppId = "772499973213954";
                     options.AppSecret = "e925b1f292fa1693d1522f18ea741a6e";
                 });
-            
+
+     
         }
 
         ////Role Creation Setup
@@ -102,6 +115,9 @@ namespace GreenHealth
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSession();
+            //app.UseHttpContextItemsMiddleware();
+
             app.UseAuthentication();
 
             app.UseRouting();
@@ -115,7 +131,7 @@ namespace GreenHealth
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
             //SeedData.EnsurePopulated(app);
-            AdminController.Initialize(context, userManager, roleManager).Wait();
+            //AdminController.Initialize(context, userManager, roleManager).Wait();
         }
     }
 }

@@ -1,8 +1,12 @@
 ﻿using GreenHealth;
+using GreenHealth.Repositories;
 using GreenHealth.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System;
 
 namespace GreenHealth.Controllers
 {
@@ -10,16 +14,18 @@ namespace GreenHealth.Controllers
     public class DoctorsController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public DoctorsController(IUnitOfWork unitOfWork)
+        private readonly IProfile _profile;
+        public DoctorsController(IUnitOfWork unitOfWork, IProfile profile)
         {
             _unitOfWork = unitOfWork;
+            _profile = profile;
         }
 
         public ActionResult Index()
         {
-            var doctors = _unitOfWork.Doctors.GetDectors();
-            return View(doctors);
+            var UserSession = JsonConvert.DeserializeObject<UserViewModel>(HttpContext.Session.GetString("USERID"));
+            var doctorprofile = _profile.GetDoctorsDetails(UserSession.Id);
+            return View(Tuple.Create(UserSession, doctorprofile));
         }
 
         //Details for admin

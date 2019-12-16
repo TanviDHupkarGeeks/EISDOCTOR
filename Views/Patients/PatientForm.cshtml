@@ -11,7 +11,7 @@
                 @using (Html.BeginForm(Model.Action, "Patients", FormMethod.Post, new { @class = "form-horizontal form-label-left", autocomplete = "off" }))
                 {
 
-
+                <div asp-validation-summary="All" class="text-danger"></div>
                     @Html.AntiForgeryToken()
                     @Html.HiddenFor(m => m.Id)
 

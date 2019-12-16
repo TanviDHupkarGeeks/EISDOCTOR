@@ -1,4 +1,6 @@
-﻿namespace GreenHealth.ViewModels
+﻿using GreenHealth.Models;
+
+namespace GreenHealth.ViewModels
 {
     public class UserViewModel
     {
@@ -8,7 +10,7 @@
         public string Email { get; set; }
         public string Role { get; set; }
         public bool? IsActive { get; set; }
-        //public IEnumerable<SelectListItem> RolesList { get; set; }
+        public UserTypes usertype { get; set; }
 
 
     }

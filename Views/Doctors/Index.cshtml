@@ -1,6 +1,7 @@
-﻿@model IEnumerable<GreenHealth.Models.Doctor>
+﻿@model Tuple<GreenHealth.ViewModels.UserViewModel, GreenHealth.Models.Doctor>
 @{
     ViewBag.Title = "Index";
+    var aa = Model;
 }
 <div class="page-title">
     <div class="title_left">
@@ -8,7 +9,7 @@
     </div>
 </div>
 
-<div class="row">
+@*<div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
         <div class="x_content">
@@ -61,7 +62,7 @@
             </table>
         </div>
     </div>
-  </div>
+  </div>*@
 
 
         </div>
