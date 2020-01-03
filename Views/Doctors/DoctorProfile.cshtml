@@ -26,7 +26,7 @@
                             <img class="img-responsive avatar-view" src="~/Content/images/user.png" alt="Avatar" title="Change the avatar">
                         </div>
                     </div>
-                    <h3>@Model.Doctor.Name</h3>
+                    <h3>@Model.Doctor.Physician.Name</h3>
                     <ul class="list-unstyled user_data">
                         <li>
                             <i class="fa fa-briefcase user-profile-icon"></i> @Model.Doctor.Specialization.Name
@@ -61,6 +61,11 @@
                         <div id="myTabContent" class="tab-content">
                             <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
                                 <!-- start patient today -->
+                         
+
+                                <!-- end patient today -->
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
                                 <table id="patients" class="data table table-striped no-margin">
                                     <thead>
                                         <tr>
@@ -89,8 +94,6 @@
                                         }
                                     </tbody>
                                 </table>
-
-                                <!-- end patient today -->
                             </div>
                         </div>
                     </div>

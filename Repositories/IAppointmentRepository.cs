@@ -9,6 +9,7 @@ namespace GreenHealth.Repositories
     public interface IAppointmentRepository
     {
         IEnumerable<Appointment> GetAppointments();
+        IEnumerable<Appointment> GetAppointmentsById(string userId);
         IEnumerable<Appointment> GetAppointmentWithPatient(int id);
         IEnumerable<Appointment> GetAppointmentByDoctor(int id);
         IEnumerable<Appointment> GetTodaysAppointments(int id);

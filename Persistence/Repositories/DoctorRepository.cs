@@ -16,7 +16,7 @@ namespace GreenHealth.Persistence.Repositories
         }
 
 
-        public IEnumerable<Doctor> GetDectors()
+        public IEnumerable<Doctor> GetDoctors()
         {
             return _context.Doctors
                 .Include(s => s.Specialization)
