@@ -12,7 +12,6 @@ namespace GreenHealth.ViewModels
         public bool? IsActive { get; set; }
         public UserTypes usertype { get; set; }
 
-        public  int  ClientId { get; set; }
 
     }
 }

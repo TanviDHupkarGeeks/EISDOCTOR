@@ -1,10 +1,7 @@
-﻿@model IEnumerable<GreenHealth.Models.Doctor>
-@using Microsoft.AspNetCore.Identity
-@using GreenHealth.Models
-
+﻿@model Tuple<GreenHealth.ViewModels.UserViewModel, GreenHealth.Models.Doctor>
 @{
-
     ViewBag.Title = "Index";
+    var aa = Model;
 }
 <div class="page-title">
     <div class="title_left">
@@ -12,89 +9,63 @@
     </div>
 </div>
 
-<div class="row">
+@*<div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
-            <div class="x_content">
-
-                @if (User.IsInRole(RoleName.AdministratorRoleName))
+        <div class="x_content">
+            <table id="doctors" class="data table table-striped no-margin">
+                <thead>
+                    <tr>
+                        <th> Name </th>
+                        <th>Phone </th>
+                        <th>Specialization </th>
+                        <th>Status</th>
+                        <th>Account Status</th>
+                        <th><a href="@Url.Action("RegisterDoctor","Account")" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i>Add</a></th>
+                    </tr>
+                </thead>
+                @foreach (var item in Model)
                 {
-                    <ul>
-                    <li><a href="@Url.Action("RegisterDoctor", "Account")" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i>Add</a></li></ul>
+                    <tr>
+                        <td> @item.Name </td>
+                        <td>@item.Phone</td>
+                        <td> @item.Specialization.Name</td>
+                        <td>@{
+                                if (item.IsAvailable == true)
+                                 {
+                                     <a href="#" style="padding: 3px 10px 3px 10px; background-color:green " class="badge" readonly>Available</a>
+                                 }
+                                 else
+                                 {
+                                     <a href="#" style="padding: 3px 10px 3px 10px; background-color:red " class="badge" readonly>Closed</a>
+                                 }
+                            }</td>
+                        <td>
+                            @{
+                                //cast to bool
+                                if ((bool) item.Physician.IsActive)
+                                {
+                                    <a href="#" style="padding: 3px 10px 3px 10px; background-color:green " class="badge" readonly>Active</a>
+                                }
+                                else
+                                {
+                                    <a href="#" style="padding: 3px 10px 3px 10px; background-color:red " class="badge" readonly>locked</a>
+                                }
+                            }
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Details","Doctors", new { id = item.Id})" class="btn btn-default btn-xs"><i class="fa fa-folder"></i>Details</a>
+                        </td>
+                    </tr>
                 }
 
-                @foreach (var doctor in Model)
-                {
-                    <ul class="nav navbar-right panel_toolbox">
-                        <li>
-                            <a href="@Url.Action("Edit","Doctors", new{id = doctor.PhysicianId})" class="btn-link"><i class="fa fa-edit m-right-xs"></i>Edit</a>
-
-                        </li>
-                    </ul>
-
-                    <div class="clearfix"></div>
-                
-            
-                <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
-                    <div class="profile_img">
-                        <div id="crop-avatar">
-                            <!-- Current avatar -->
-                            <img class="img-responsive avatar-view" src="~/Content/images/user.png" alt="Avatar" title="Change the avatar">
-                        </div>
-                    </div>
-                    <h3>@doctor.Name</h3>
-                    <ul class="list-unstyled user_data">
-                        <li>
-                            <i class="fa fa-briefcase user-profile-icon"></i> @doctor.Specialization.Name
-                        </li>
-                        <li>
-                            <i class="fa fa-map-marker user-profile-icon"></i> @doctor.Address
-                        </li>
-                        <li>
-                            <i class="fa fa-phone"></i>
-                        </li>
-                        <li><i class="fa fa-inbox"></i>@doctor.Physician.Email</li>
-
-                    </ul>
-                    <!-- start skills -->
-                    @if (doctor.IsAvailable == true)
-                    {
-                        <a href="#" style="padding: 3px 10px 3px 10px; background-color:green " class="badge" readonly>Available</a>
-                    }
-                    else
-                    {
-                        <a href="#" style="padding: 3px 10px 3px 10px; background-color:red " class="badge" readonly>Closed</a>
-                    }
-                    @if (doctor.Physician.IsActive == true)
-                    {
-                        <a href="#" style="padding: 3px 10px 3px 10px; background-color:green " class="badge" readonly>Active</a>
-                    }
-                    else
-                    {
-                        <a href="#" style="padding: 3px 10px 3px 10px; background-color:red " class="badge" readonly>locked</a>
-                    }
-                    <table>
-                        <tr class="">
-                            @if (!User.IsInRole(RoleName.DoctorRoleName))
-                            {
-                            <td class=""><a class="btn btn-primary btn-sm" href="@Url.Action("BookDoctor", "Appointments", new { Id = doctor.Id })">Book</a></td>
-                            }
-                            <td class=""><a href="@Url.Action("ProfileForDoctor", "Doctors", new {Id = doctor.Id })" class="btn btn-info btn-sm">View</a></td>
-                        </tr>
-                    </table>
-                    <!-- end of skills -->
-                </div>
-              }
-                    
-            </div>
-  
-   </div>
-   </div>
-   </div>
-  
+            </table>
+        </div>
+    </div>
+  </div>*@
 
 
-
+        </div>
 
 @section scripts{
     <script>
@@ -102,4 +73,4 @@
             $("#doctors").DataTable();
         });
     </script>
-}
+    }

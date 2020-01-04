@@ -1,8 +1,7 @@
 ﻿@model IEnumerable<GreenHealth.Models.Patient>
-@using GreenHealth.Models
-@{
-
-}
+    @{
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
 
 <div class="page-title">
     <div class="title_left">
@@ -14,31 +13,21 @@
     <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
             <div class="x_content">
-                @if (User.IsInRole(RoleName.AdministratorRoleName))
-                {
-                    <ul> <li><a href="@Url.Action("Create", "Patients")" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i>Add</a></li></ul>
-                }
-                @foreach (var item in Model)
-                {
-                    <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
-                        <div class="profile_img">
-                            <div id="crop-avatar">
-                                <!-- Current avatar -->
-                                <img class="img-responsive avatar-view" src="~/Content/images/user.png" alt="Avatar" title="Change the avatar">
-                            </div>
-                        </div>
-                        <ul>
 
-                            <li>Patient ID : @item.Token</li>
-                            <li>Name: @item.Name</li>
-                            <li>Phone: @item.Phone</li>
-                            <li>Address: @item.Address</li>
-                            <li>City: @item.CityId</li>
+                <table id="patients" class="data table table-striped no-margin">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>City</th>
+                            <th><a href="@Url.Action("Create","Patients")" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i>Add</a></th>
 
-                        </ul>
-                    </div>
-                }
-
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -58,7 +47,7 @@
                 columns: [
                     {
                         data: "token"
-
+                        
                     },
                     {
                         data: "name"
@@ -67,7 +56,7 @@
                         data: "phone",
                         render: function (data) {
                             return data.toString().replace(
-                                /(\d\d\d)(\d\d\d)(\d\d\d\d)/g, '$1-$2-$3');
+                              /(\d\d\d)(\d\d\d)(\d\d\d\d)/g, '$1-$2-$3');
                         }
                     },
                     {
@@ -89,7 +78,7 @@
             });
 
 
-
+          
 
 
             $("#patients").on("click", ".js-delete", function () {

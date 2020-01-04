@@ -34,7 +34,7 @@
                         <td>@item.StartDateTime.ToString("MMM")-@item.StartDateTime.ToString("d ")-@item.StartDateTime.ToString("yyyy")</td>
                         <td>@item.StartDateTime.ToString("HH:mm")</td>
                         <td>@item.Detail</td>
-                        <td><a href="@Url.Action("Create","OpdAttendances", new {id = item.Patient.Id})" class="btn-info btn-sm" ><i class="fa fa-plus"></i>OPD</a></td>
+                        @*<td><a href="@Url.Action("Create","OpdAttendances", new {id = item.Patient.Id})" class="btn-info btn-sm" ><i class="fa fa-plus"></i>OPD</a></td>*@
                     </tr>
                 }
                 </tbody>

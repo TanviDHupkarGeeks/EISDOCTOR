@@ -12,41 +12,31 @@
     @Html.HiddenFor(m => m.Patient)
     <div class="row">
         <div class="col-md-6 col-xs-12">
-            @if (Model.Doctor == 0)
-            {
-                <div class="x_panel">
-                    <div class="x_content">
-                        <br />
-                        <span class="section">Doctor info</span>
-                        <div class="form-group">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Doctor</label>
-                            <div class="col-md-9 col-sm-9 col-xs-12">
-                                @Html.DropDownListFor(m => m.Doctor, new SelectList(Model.Doctors, "Id", "Name"), "Select one", new { @class = "form-control", id = "PhysicianID" })
-                                @Html.ValidationMessageFor(m => m.Doctor, string.Empty, new { @class = "" })
-                            </div>
+            <div class="x_panel">
+                <div class="x_content">
+                    <br />
+                    <span class="section">Doctor info</span>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Doctor</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                            @Html.DropDownListFor(m => m.Doctor, new SelectList(Model.Doctors, "Id", "Name"), "Select one", new { @class = "form-control", id = "DoctorID" })
+                            @Html.ValidationMessageFor(m => m.Doctor, string.Empty, new { @class = "" })
                         </div>
-
                     </div>
+
                 </div>
-            }
-            else
-            {
-                @Html.HiddenFor(x=>x.Doctor)
-        <p>
-            Doctor's Name : @ViewBag.DoctorName
-        </p>  
-            }
+            </div>
             @*<div class="x_panel">
-                    <div class="x_content">
-                        <div class="form-group">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Doctors">Doctors</label>
-                            <div class="col-md-9 col-sm-9 col-xs-12">
-                                <select id="DoctorID" name="Doctors" class="form-control"></select>
-                            </div>
+                <div class="x_content">
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Doctors">Doctors</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                            <select id="DoctorID" name="Doctors" class="form-control"></select>
                         </div>
-
                     </div>
-                </div>*@
+
+                </div>
+            </div>*@
             <div class="x_panel">
                 <div class="x_content">
                     <div id="divAppointments"></div>
@@ -62,14 +52,14 @@
                     <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Date<span class="required">*</span></label>
                         <div class="col-md-9 col-sm-9 col-xs-12">
-                            @Html.TextBoxFor(m => m.Date, new { @type = "date", @class = "form-control date", id = "date" })
+                            @Html.TextBoxFor(m => m.Date, new { @class = "form-control date" })
                             @Html.ValidationMessageFor(m => m.Date)
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Time<span class="required">*</span> </label>
                         <div class="col-md-9 col-sm-9 col-xs-12">
-                            @Html.TextBoxFor(m => m.Time, new { @type = "time", @class = "form-control time" })
+                            @Html.TextBoxFor(m => m.Time, new { @class = "form-control time" })
                             @Html.ValidationMessageFor(m => m.Time)
                         </div>
                     </div>
@@ -100,12 +90,6 @@
 
 @section scripts{
     <script src="~/bundles/jqueryval"></script>
-    <script language="javascript">
-        $(document).ready(function () {
-            $('#date').datepicker({ dateFormat: '<%= Html.ConvertDateFormat() %>' });
-
-        });
-    </script>
     <script>
         $(document).ready(function () {
             $('#divAppointments').hide();
@@ -115,7 +99,7 @@
                 var items = '<option value="">Select Doctor</option>';
                 $.each(data, function (i, doctor) {
                     items += "<option value='" + doctor.Value + "'>" + doctor.Text
-                        + "</option>";
+                    + "</option>";
                 });
                 $('#DoctorID').html(items);
             });
@@ -131,20 +115,20 @@
                     dataType: 'html'
 
                 })
-                    .success(function (result) {
-                        $('#divAppointments').show();
-                        $('#divAppointments').html(result);
-                    })
-                    .error(function (xhr, status) {
-                        alert(status);
-                    })
+                .success(function (result) {
+                    $('#divAppointments').show();
+                    $('#divAppointments').html(result);
+                })
+                .error(function (xhr, status) {
+                    alert(status);
+                })
 
             });
 
 
         });
 
-        $('#date').datepicker({
+        $('.date').datepicker({
             minDate: 0,
             format: "dd/mm/yyyy",
             todayHighlight: true,

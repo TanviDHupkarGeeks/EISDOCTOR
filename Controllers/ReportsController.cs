@@ -1,9 +1,9 @@
 ﻿using System;
-using GreenHealth;
-using GreenHealth.ViewModels;
-using Microsoft.AspNetCore.Mvc;
+using System.Web.Mvc;
+using ClinicManagement.Core;
+using ClinicManagement.Core.ViewModel;
 
-namespace GreenHealth.Controllers
+namespace ClinicManagement.Controllers
 {
     public class ReportsController : Controller
     {

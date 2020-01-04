@@ -1,73 +1,65 @@
-﻿@model Tuple<GreenHealth.ViewModels.UserViewModel, GreenHealth.Models.Patient, GreenHealth.Models.Appointment>;
-@using Microsoft.AspNetCore.Http
-@inject IHttpContextAccessor httpContextAccessor
+﻿@model Tuple<GreenHealth.ViewModels.UserViewModel, GreenHealth.Models.Patient>;
 
 @{
     ViewBag.Title = "My profile";
     var aa = Model;
-    Layout = "~/Views/Shared/_LayoutLoggedIn.cshtml";
 }
 <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
-        @httpContextAccessor.HttpContext.Session.GetString("USERID")
         <div class="x_panel">
             <div class="x_title">
-                <h2>Welcome @Model.Item1.ClientId </h2>
+                <h2>Manage Users </h2>
                 <div class="clearfix"></div>
             </div>
-            <div class="x_content">
-                <div class="x_title">
-                    <h2>Profile </h2>
-                    <ul class="nav navbar-right panel_toolbox">
-                        <li>
-                            <a href="@Url.Action("Edit","Account", new{id =Model.Item1.Id})" class="btn-link"><i class="fa fa-edit m-right-xs"></i>Edit</a>
+       <div class="x_content">
+            <table id="users" class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th> <label>Email</label> </th>
+                    <th><label>Role</label></th>
+                    <th><label>Account Status</label></th>
 
-                        </li>
-                    </ul>
-
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                    <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
-                        <div class="profile_img">
-                            <div id="crop-avatar">
-                                <!-- Current avatar -->
-                                <img class="img-responsive avatar-view" src="~/Content/images/user.png" alt="Avatar" title="Change the avatar">
-                            </div>
-                        </div>
-                        <h3>@Model.Item2.Name</h3>
-                        <ul class="list-unstyled user_data">
-                            <li>
-                                <i class="fa fa-briefcase user-profile-icon"></i>
-                            </li>
-                            <li>
-                                <i class="fa fa-map-marker user-profile-icon"></i> @Model.Item2.Address
-                            </li>
-                            <li>
-                                <i class="fa fa-phone"></i> @Model.Item2.Phone
-                            </li>
-                            <li><i class="fa fa-inbox"></i>@Model.Item2.Sex</li>
-
-                        </ul>
-                        <!-- start skills -->
-                        <!-- end of skills -->
-                        @*<a href="@Url.Action("Edit","Account", new { id = Model.Item1.Id})"><i class="fa fa-pencil-square"></i></a>*@
+                    <th></th>
+                </tr>
+                </thead>
+                @*@foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td>@item.Role</td>
+                        <td>
+                            @{
+                                //cast to bool
+                                if ((bool)item.IsActive)
+                                {
+                                    <a href="#" style="padding: 3px 10px 3px 10px; background-color:green " class="badge" readonly>Active</a>
+                                }
+                                else
+                                {
+                                    <a href="#" style="padding: 3px 10px 3px 10px; background-color:red " class="badge" readonly>locked</a>
+                                }
+                            }
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Edit","Account", new { id = item.Id})"><i class="fa fa-pencil-square"></i></a>
+                        </td>
 
 
+                    </tr>
+                  }*@
 
-
-                        @*@Model.Item3.StartDateTime*@
-
-
-                    </div>
-                </div>
+            </table>
             </div>
         </div>
-    </div></div>
-        @section scripts{
-            <script>
-                $(document).ready(function () {
-                    var table = $("#users").DataTable();
-                });
-            </script>
-        }
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var table = $("#users").DataTable();
+        });
+    </script>
+}
