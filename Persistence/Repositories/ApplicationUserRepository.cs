@@ -29,7 +29,6 @@ namespace GreenHealth.Persistence.Repositories
                         Id = user.Id,
                         Email = user.Email,
                         Role = role.Name,
-                        //IsActive = user.
                     }).ToList();
 
         }

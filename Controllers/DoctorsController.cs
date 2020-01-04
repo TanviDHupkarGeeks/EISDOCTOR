@@ -15,18 +15,28 @@ namespace GreenHealth.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IProfile _profile;
-        public DoctorsController(IUnitOfWork unitOfWork, IProfile profile)
+        private readonly IDoctorRepository _doctors;
+        public DoctorsController(IUnitOfWork unitOfWork, IProfile profile, IDoctorRepository doctor)
         {
             _unitOfWork = unitOfWork;
             _profile = profile;
+            _doctors = doctor;
         }
 
         public ActionResult Index()
         {
-            var UserSession = JsonConvert.DeserializeObject<UserViewModel>(HttpContext.Session.GetString("USERID"));
-            var doctorprofile = _profile.GetDoctorsDetails(UserSession.Id);
-            return View(Tuple.Create(UserSession, doctorprofile));
+            return View(_doctors.GetDoctors());
         }
+
+        //change this view to a small profile detail page
+        [HttpGet]
+        public ActionResult ProfileForDoctor(int id)
+        {
+            var doctorprofile = _profile.GetDoctorById(id);
+            return View(doctorprofile);
+        }
+
+
 
         //Details for admin
         public ActionResult Details(int id)

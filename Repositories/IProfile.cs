@@ -11,7 +11,9 @@ namespace GreenHealth.Repositories
     {
         Task<dynamic> GetProfile(string userId);
         Doctor GetDoctorsDetails(string userId);
+        Doctor GetDoctorById(int id);
         Patient GetPatientDetails(string userId);
+        Patient GetPatientById(int id);
         UserViewModel GetUserType(string userId);
     }
 }

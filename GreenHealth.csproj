@@ -28,7 +28,8 @@
   <ItemGroup>
     <Compile Remove="Controllers\AccountController1.cs" />
     <Compile Remove="Controllers\DoctorController.cs" />
-    <Compile Remove="Controllers\ReportsController.cs" />
+    <Compile Remove="Helper\EmailSender.cs" />
+    <Compile Remove="Helper\ServicesMessageSenderOptions.cs" />
     <Compile Remove="Migrations\20191210161354_Original.cs" />
     <Compile Remove="Migrations\20191210161354_Original.Designer.cs" />
     <Compile Remove="Migrations\20191213164131_AllGreen.cs" />

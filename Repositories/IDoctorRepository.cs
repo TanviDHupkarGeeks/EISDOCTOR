@@ -5,7 +5,7 @@ namespace GreenHealth.Repositories
 {
     public interface IDoctorRepository
     {
-        IEnumerable<Doctor> GetDectors();
+        IEnumerable<Doctor> GetDoctors();
         IEnumerable<Doctor> GetAvailableDoctors();
         Doctor GetDoctor(int id);
         Doctor GetProfile(string userId);
