@@ -29,7 +29,7 @@ namespace GreenHealth.Controllers
             string desc1 = "This is an Admin Role";
             string desc2 = "This is a Doctor Role";
             string desc3 = "This is a Patient Role";
-            string password = "P@ssword";
+            var hasher = new PasswordHasher<ApplicationUser>();
 
             if (await roleManager.FindByNameAsync(role1) == null)
             {
@@ -55,9 +55,11 @@ namespace GreenHealth.Controllers
                     EmailConfirmed = true,
                     Role = role1,
                     IsActive = true,
+                    PasswordHash = hasher.HashPassword(null, "p@ssword"),
+                    UserType = 0
                  
             };
-                await userManager.AddPasswordAsync(user, password);
+               
                 var result = await userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -66,23 +68,22 @@ namespace GreenHealth.Controllers
                 }
                 admin1 = user.Id;
             }
-            
-            //if (!context.Cities.Any())
-            //{
-            //   context.Cities.AddRange(new City { Name = "Antrim", }, new City { Name = "Armagh", }, new City { Name = "Carlow", }, new City { Name = "Cavan", }, new City { Name = "Clare", },
-            //    new City { Name = "Cork", }, new City { Name = "Derry(Londonderry)", }, new City { Name = "Donegal", }, new City { Name = "Down", }, new City { Name = "Dublin", },
-            //    new City { Name = "Fermanagh", }, new City { Name = "Galway", }, new City { Name = "Kerry", }, new City { Name = "Kilkenny", }, new City { Name = "Laois(Queens)", },
-            //    new City { Name = "Limerick", }, new City { Name = "Longford", }, new City { Name = "Louth", }, new City { Name = "Mayo", }, new City { Name = "Meath", });
 
-            //    context.SaveChanges();
-            //}
-            
-            //if (!context.Specializations.Any())
-            //{
-            //    context.Specializations.AddRange(new Specialization { Name = "Anaesthesia", }, new Specialization { Name = "Clinical oncology", }, new Specialization { Name = "Clinical radiology", }, new Specialization { Name = "Clinical radiology", },
-            //    new Specialization { Name = "Emergency medicine", }, new Specialization { Name = "General practice(GP)", }, new Specialization { Name = "Cardiology" });
-            //}
-            //context.SaveChanges();
+            if (!context.Cities.Any())
+            {
+                context.Cities.AddRange(new City { Id = 1, Name = "Antrim", }, new City { Id = 2, Name = "Armagh", }, new City { Id = 3, Name = "Carlow", }, new City { Id = 4, Name = "Cavan", }, new City { Id = 5, Name = "Clare", },
+                 new City { Id = 6, Name = "Cork" }, new City {Id = 7, Name = "Derry(Londonderry)", }, new City { Id = 8, Name = "Donegal", }, new City { Id = 9, Name = "Down", }, new City { Id = 10, Name = "Dublin", },
+                 new City { Id = 11, Name = "Fermanagh", }, new City { Id = 12, Name = "Galway", }, new City { Id = 13, Name = "Kerry", }, new City { Id = 14, Name = "Kilkenny", }, new City { Id = 15, Name = "Laois(Queens)", },
+                 new City { Id = 16, Name = "Limerick", }, new City { Id = 17, Name = "Longford", }, new City { Id = 18, Name = "Louth", }, new City { Id = 19, Name = "Mayo", }, new City { Id = 20, Name = "Meath", });
+   
+            }
+
+            if (!context.Specializations.Any())
+            {
+                context.Specializations.AddRange(new Specialization { Name = "Anaesthesia", }, new Specialization { Name = "Clinical oncology", }, new Specialization { Name = "Clinical radiology", }, new Specialization { Name = "Clinical radiology", },
+                new Specialization { Name = "Emergency medicine", }, new Specialization { Name = "General practice(GP)", }, new Specialization { Name = "Cardiology" });
+            }
+            context.SaveChanges();
         }
         //public ActionResult Index()
         //{

@@ -59,7 +59,7 @@
                         <ul class="nav-menu">
                             <li class="menu-active"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                             <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
-                            <li><a href="#">doctors</a></li>
+                            <li><a asp-controller="Doctors" asp-action="Index">doctors</a></li>
 
 
                             <li class="menu-has-children">
@@ -71,39 +71,37 @@
                             </li>
                             <li><a href="#">Contact</a></li>
 
-                        </ul>
-                        @if (signInManager.IsSignedIn(User))
-                        {
-                            <form method="post" asp-action="logout" asp-controller="Account">
-                                <button type="submit">
-                                    Logout @User.Identity.Name
-                                </button>
-                            </form>
-                        }
-                        else
-                        {
+                            
+                            @if (signInManager.IsSignedIn(User))
+                            {<li>
+                                <form method="post" asp-action="logout" asp-controller="Account">
+                                    <button type="submit">
+                                        Logout @User.Identity.Name
+                                    </button>
+                                </form>
+                            </li>
+                            }
+                            else
+                            {
 
-                            <li>
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                            </li>
-                            <li>
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
-                            </li>
-                        }
+                                <li>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                                </li>
+                                <li>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                                </li>
+                            }
+                        </ul>
                     </nav><!-- #nav-menu-container -->
                 </div>
             </div>
         </div>
     </header>
-
-
-
-
-
     <!-- /top navigation -->
-   
-            @RenderBody()
-      
+    <br />
+    
+    @RenderBody()
+
     <!-- footer content -->
     <footer class="footer-area section-padding">
         <div class="footer-widget">

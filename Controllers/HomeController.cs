@@ -29,14 +29,21 @@ namespace GreenHealth.Controllers
         {
             var userId = HttpContext.User.Identity.GetUserId();
             var userTypes = _profile.GetUserType(userId);
-            HttpContext.Session.SetString("USERID", JsonConvert.SerializeObject(userTypes));
+            
             if(userTypes.usertype == UserTypes.Doctor)
             {
-                return Redirect("/doctors/index");
+                HttpContext.Session.SetString("USERID", JsonConvert.SerializeObject(userTypes));
+                return Redirect("/doctors/doctorprofile");
+            }
+            else if(userTypes.usertype == UserTypes.Patients)
+            {
+                HttpContext.Session.SetString("USERID", JsonConvert.SerializeObject(userTypes));
+                return Redirect("/account/index");
             }
             else
             {
-                return Redirect("/account/index");
+                HttpContext.Session.SetString("USERID", JsonConvert.SerializeObject(userTypes));
+                return Redirect("/doctors/index");
             }
             
         }
