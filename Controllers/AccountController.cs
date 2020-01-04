@@ -16,9 +16,6 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using GreenHealth.Repositories;
 using Newtonsoft.Json;
-using SendGrid;
-using SendGrid.Helpers.Mail;
-using GreenHealth.Email;
 //using Microsoft.AspNet.Identity;
 
 namespace GreenHealth.Controllers
@@ -31,56 +28,29 @@ namespace GreenHealth.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IProfile _profile;
-        private readonly IEmailSender _emailSender;
-       
+
         //public AccountController(IUnitOfWork unitOfWork)
         //{
         //    _unitOfWork = unitOfWork;
         //}
         public AccountController(UserManager<ApplicationUser> userManager,
                                     SignInManager<ApplicationUser> signInManager,
-                                    RoleManager<ApplicationRole> roleManager, IUnitOfWork unitOfWork, 
-                                    IProfile profile, IEmailSender emailSender)
+                                    RoleManager<ApplicationRole> roleManager, IUnitOfWork unitOfWork, IProfile profile)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.roleManager = roleManager;
             _unitOfWork = unitOfWork;
             this._profile = profile;
-            _emailSender = emailSender;
         }
 
         // GET: Account
-
-        //static async Task Execute()
-        //{
-        //    var apiKey = Environment.GetEnvironmentVariable("NAME_OF_THE_ENVIRONMENT_VARIABLE_FOR_YOUR_SENDGRID_KEY");
-        //    var client = new SendGridClient(apiKey);
-        //    var from = new EmailAddress("test@example.com", "Example User");
-        //    var subject = "Sending with SendGrid is Fun";
-        //    var to = new EmailAddress("test@example.com", "Example User");
-        //    var plainTextContent = "and easy to do anywhere, even with C#";
-        //    var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
-        //    var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-        //    var response = await client.SendEmailAsync(msg);
-        //}
         [Authorize]
         public IActionResult Index()
         {
-            //try
-            //{
-            
-
-
-                var UserSession = JsonConvert.DeserializeObject<UserViewModel>(HttpContext.Session.GetString("USERID"));
-                var patientProfile = _profile.GetPatientDetails(UserSession.Id);
-                var appointments = _unitOfWork.Appointments.GetAppointment(UserSession.ClientId);
-                return View(Tuple.Create(UserSession, patientProfile, appointments));
-            //}
-            //catch
-            //{
-            //    return View();
-            //}
+            var UserSession = JsonConvert.DeserializeObject<UserViewModel>(HttpContext.Session.GetString("USERID"));
+            var patientProfile = _profile.GetPatientDetails(UserSession.Id);
+            return View(Tuple.Create(UserSession, patientProfile));
         }
 
         // GET: Account/Details/5
@@ -119,7 +89,7 @@ namespace GreenHealth.Controllers
                     UserName = model.Email,
                     Email = model.Email,
                     Role = RoleName.PatientRoleName,
-                    IsActive = true
+                    IsActive = false
                 };
                 var result = await userManager.CreateAsync(user, model.Password);
 
@@ -129,12 +99,6 @@ namespace GreenHealth.Controllers
 
 
                     await userManager.AddToRoleAsync(user, RoleName.PatientRoleName);
-
-                    //Sending Confirmation Email
-                    var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackurl = Url.Action("ConfirmEmail", "Account", new { UserId = user.Id, Code = code }, protocol: HttpContext.Request.Scheme);
-                    await _emailSender.SendEmailAsync(user.Email, "GreenHealth - Confirm Your Email", "Please confirm your email by clicking this link: <a href=\"" + callbackurl);
-                    //return Ok(new { username = user.UserName, email = user.Email, status = 1, message = "Registration Successful" });
                     await userManager.AddClaimAsync(user, new Claim(ClaimTypes.GivenName, model.Name));
                     await signInManager.SignInAsync(user, isPersistent: false);
 
@@ -152,41 +116,31 @@ namespace GreenHealth.Controllers
 
 
         }
-        [HttpGet("[action]")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail(string userId, string code)
-        {
-            if (userId == null || code == null)
-            {
-                return RedirectToAction("index", "home");
-            }
 
-            var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                ViewBag.ErrorMessage = $"The User ID {userId} is invalid";
-                return View("NotFound");
-            }
-            if (user.EmailConfirmed)
-            {
-                return Redirect("/login");
-            }
-            var result = await userManager.ConfirmEmailAsync(user, code);
-            if (result.Succeeded)
-            {
-                return RedirectToAction("EmailConfirmed", "Notifictions", new { userId, code });
-            }
-            else
-            {
-                List<string> errors = new List<string>();
-                foreach (var error in result.Errors)
-                {
-                    errors.Add(error.ToString());
-                }
-                return new JsonResult(errors);
-            }
-            
-        }
+        //[AllowAnonymous]
+        //public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        //{
+        //    if (userId == null || token == null)
+        //    {
+        //        return RedirectToAction("index", "home");
+        //    }
+
+        //    var user = await userManager.FindByIdAsync(userId);
+        //    if (user == null)
+        //    {
+        //        ViewBag.ErrorMessage = $"The User ID {userId} is invalid";
+        //        return View("NotFound");
+        //    }
+
+        //    var result = await userManager.ConfirmEmailAsync(user, token);
+        //    if (result.Succeeded)
+        //    {
+        //        return View();
+        //    }
+
+        //    ViewBag.ErrorTitle = "Email cannot be confirmed";
+        //    return View("Error");
+        //}
 
         // GET: Account/Login
         [HttpGet]
@@ -214,18 +168,19 @@ namespace GreenHealth.Controllers
             if (ModelState.IsValid)
             {
                 var user = await userManager.FindByEmailAsync(model.Email);
-                //if (user != null && !user.EmailConfirmed &&
-                //    (await userManager.CheckPasswordAsync(user, model.Password)))
-                //{
-                //    ModelState.AddModelError(string.Empty, "Email not confirmed yet, Please confirm your email");
-                //    return View(model);
-                //}
+                if (user != null && !user.EmailConfirmed &&
+                    (await userManager.CheckPasswordAsync(user, model.Password)))
+                {
+                    ModelState.AddModelError(string.Empty, "Email not confirmed yet");
+                    return View(model);
+                }
 
                 var result = await signInManager.PasswordSignInAsync(model.Email, model.Password,
                     model.RememberMe, false).ConfigureAwait(true);
 
                 if (result.Succeeded)
                 {
+
                     return RedirectToAction("Me", "Home");
                 }
 
@@ -240,8 +195,7 @@ namespace GreenHealth.Controllers
 
         }
 
-        //Doctor Account registration
-       [HttpGet]
+        //Doctor registration
         [AllowAnonymous]
         public IActionResult RegisterDoctor()
         {
@@ -293,10 +247,9 @@ namespace GreenHealth.Controllers
                     _unitOfWork.Complete();
                     return RedirectToAction("Index", "Doctors");
                 }
-                viewModel.Specializations = _unitOfWork.Specializations.GetSpecializations();
 
                 ModelState.AddModelError("", "Something failed.");
-                return View("DoctorForm", viewModel);
+                return View(viewModel);
             }
 
             viewModel.Specializations = _unitOfWork.Specializations.GetSpecializations();
@@ -355,11 +308,11 @@ namespace GreenHealth.Controllers
             {
                 user = await userManager.FindByEmailAsync(email);
 
-                //if (user != null && !user.EmailConfirmed)
-                //{
-                //    ModelState.AddModelError(string.Empty, "Email not confirmed yet");
-                //    return View("Login", loginViewModel);
-                //}
+                if (user != null && !user.EmailConfirmed)
+                {
+                    ModelState.AddModelError(string.Empty, "Email not confirmed yet");
+                    return View("Login", loginViewModel);
+                }
 
 
             }
@@ -390,31 +343,17 @@ namespace GreenHealth.Controllers
                         user = new ApplicationUser
                         {
                             UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
-                            Email = info.Principal.FindFirstValue(ClaimTypes.Email),
-                            Name = info.Principal.FindFirstValue(ClaimTypes.Name),
-                            Role = RoleName.PatientRoleName,
-                            IsActive = true,
+                            Email = info.Principal.FindFirstValue(ClaimTypes.Email)
                         };
-
                         await userManager.CreateAsync(user);
-                        await userManager.AddToRoleAsync(user, RoleName.PatientRoleName);
-                        await userManager.AddClaimAsync(user, new Claim(ClaimTypes.GivenName, user.Name));
-
-                        //Sending Confirmation Email
-                        var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                                          var callbackurl = Url.Action("ConfirmEmail", "Account", new { UserId = user.Id, Code = code }, protocol: HttpContext.Request.Scheme);
-                                            await _emailSender.SendEmailAsync(user.Email, "GreenHealth - Confirm Your Email", "Please confirm your email by clicking this link: <a href=\"" + callbackurl);
-                        //return Ok(new { username = user.UserName, email = user.Email, status = 1, message = "Registration Successful" });
 
                     }
-
-                   
 
                     // Add a login (i.e insert a row for the user in AspNetUserLogins table)
                     await userManager.AddLoginAsync(user, info);
                     await signInManager.SignInAsync(user, isPersistent: false);
 
-                    return RedirectToAction("create", "patients");
+                    return LocalRedirect(returnUrl);
                 }
 
                 // If we cannot find the user email we cannot continue

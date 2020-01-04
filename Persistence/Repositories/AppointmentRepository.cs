@@ -5,21 +5,15 @@ using System.Linq;
 using GreenHealth.Models;
 using GreenHealth.Repositories;
 using GreenHealth.ViewModels;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace GreenHealth.Persistence.Repositories
 {
     public class AppointmentRepository : IAppointmentRepository
     {
-        //private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _context;
         public AppointmentRepository(AppDbContext context)
         {
             _context = context;
-            //_userManager = userManager;
         }
         /// <summary>
         /// Get all appointments
@@ -85,17 +79,6 @@ namespace GreenHealth.Persistence.Repositories
             return _context.Appointments
                 .Where(d => d.Doctor.PhysicianId == userId && d.StartDateTime >= today && d.Status==true)
                 .Include(p => p.Patient)
-                .OrderBy(d => d.StartDateTime)
-                .ToList();
-        }
-
-        public IEnumerable<Appointment> GetAppointmentsById(string userId)
-        {
-            //var user = _userManager.Users.FirstOrDefault(x => x.Email == User );
-            return _context.Appointments
-                .Where(d => d.Patient.UserId == userId )
-                .Include(p => p.Patient)
-                .Include(p => p.Doctor)
                 .OrderBy(d => d.StartDateTime)
                 .ToList();
         }

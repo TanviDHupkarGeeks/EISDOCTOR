@@ -5,11 +5,6 @@ namespace GreenHealth.ViewModels
 {
     public class PatientDetailViewModel
     {
-        public PatientDetailViewModel()
-        {
-            
-        }
-        
         public Patient Patient { get; set; }
         public IEnumerable<Appointment> Appointments { get; set; }
         public IEnumerable<Attendance> Attendances { get; set; }
